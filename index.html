@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SoftZone - Cửa hàng phần mềm hàng đầu Việt Nam.">
+  <title>SoftZone — Cửa Hàng Phần Mềm Premium</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/story.css">
+  <link rel="stylesheet" href="css/playground.css">
+</head>
+<body>
+  <nav id="main-nav" class="nav">
+    <div class="container nav__container">
+      <a href="#/" class="nav__logo">
+        <i data-lucide="gem" class="nav__logo-icon"></i>
+        <span class="nav__logo-text">Soft<span class="text-gradient">Zone</span></span>
+      </a>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="#/" class="nav__link nav__link--active">Trang Chủ</a></li>
+        <li><a href="#/store" class="nav__link">Cửa Hàng</a></li>
+        <li><a href="#/about" class="nav__link">Về Chúng Tôi</a></li>
+        <li><a href="#/contact" class="nav__link">Liên Hệ</a></li>
+        <li><a href="#/faq" class="nav__link">FAQ</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__cart-btn" data-action="openCart" title="Giỏ hàng">
+          <i data-lucide="shopping-cart"></i>
+          <span class="nav__cart-count" id="cart-count" style="display:none">0</span>
+        </button>
+        <div id="user-nav-area">
+          <button class="btn btn--ghost btn--sm nav__auth-btn" data-action="openAuthModal">
+            <i data-lucide="log-in"></i> <span class="nav__auth-text">Đăng nhập</span>
+          </button>
+        </div>
+        <button class="nav__mobile-toggle" id="mobile-toggle" aria-label="Menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+    <div class="nav__mobile-menu" id="mobile-menu">
+      <a href="#/" class="nav__mobile-link">Trang Chủ</a>
+      <a href="#/store" class="nav__mobile-link">Cửa Hàng</a>
+      <a href="#/about" class="nav__mobile-link">Về Chúng Tôi</a>
+      <a href="#/contact" class="nav__mobile-link">Liên Hệ</a>
+      <a href="#/faq" class="nav__mobile-link">FAQ</a>
+    </div>
+  </nav>
+
+  <main id="app" class="main-content"></main>
+
+  <footer class="footer" id="main-footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a href="#/" class="footer__logo"><i data-lucide="gem" class="logo-icon-footer"></i> Soft<span class="text-gradient">Zone</span></a>
+          <p class="footer__desc">Nền tảng cung cấp phần mềm uy tín hàng đầu. Chúng tôi mang đến các giải pháp công nghệ tốt nhất.</p>
+          <div class="footer__social">
+            <a href="#" class="footer__social-link"><i data-lucide="facebook"></i></a>
+            <a href="#" class="footer__social-link"><i data-lucide="twitter"></i></a>
+            <a href="#" class="footer__social-link"><i data-lucide="instagram"></i></a>
+            <a href="#" class="footer__social-link"><i data-lucide="linkedin"></i></a>
+            <a href="#" class="footer__social-link"><i data-lucide="github"></i></a>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__title">Sản Phẩm</h4>
+          <a href="#/store" class="footer__link">Thiết Kế</a>
+          <a href="#/store" class="footer__link">Lập Trình</a>
+          <a href="#/store" class="footer__link">Bảo Mật</a>
+          <a href="#/store" class="footer__link">AI & ML</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__title">Công Ty</h4>
+          <a href="#/about" class="footer__link">Về Chúng Tôi</a>
+          <a href="#/contact" class="footer__link">Liên Hệ</a>
+          <a href="#/faq" class="footer__link">FAQ</a>
+          <a href="#" class="footer__link">Blog</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__title">Hỗ Trợ</h4>
+          <a href="#/faq" class="footer__link">Trung Tâm Trợ Giúp</a>
+          <a href="#" class="footer__link">Chính Sách Bảo Mật</a>
+          <a href="#" class="footer__link">Điều Khoản</a>
+          <a href="#/contact" class="footer__link">Hỗ Trợ Kỹ Thuật</a>
+        </div>
+      </div>
+      <div class="footer__newsletter">
+        <h4 class="footer__title">Đăng Ký Nhận Tin</h4>
+        <form class="footer__newsletter-form" onsubmit="event.preventDefault(); SoftwareStore.Utils.showToast('Đăng ký thành công! 🎉', 'success'); this.reset();">
+          <input type="email" class="form-input" placeholder="Email của bạn..." required>
+          <button type="submit" class="btn btn--primary">Đăng Ký</button>
+        </form>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2026 SoftZone. Tất cả quyền được bảo lưu. Made with ❤️</p>
+        <div class="footer__payments"><span>💳</span><span>🅿️</span><span>🏦</span></div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-panel__header">
+      <h3><i data-lucide="shopping-cart"></i> Giỏ Hàng</h3>
+      <button class="btn btn--icon btn--ghost" data-action="closeCart"><i data-lucide="x"></i></button>
+    </div>
+    <div class="cart-panel__items" id="cart-panel-items"></div>
+    <div class="cart-panel__footer">
+      <div class="cart-panel__total-row"><span>Tổng cộng:</span><strong id="cart-panel-total">$0.00</strong></div>
+      <a href="#/cart" class="btn btn--outline cart-panel__view-btn" onclick="document.getElementById('cart-panel').classList.remove('is-open');document.getElementById('cart-overlay').classList.remove('is-open');document.body.style.overflow=''">Xem Giỏ Hàng</a>
+      <a href="#/checkout" class="btn btn--primary cart-panel__checkout-btn" id="cart-panel-checkout" onclick="document.getElementById('cart-panel').classList.remove('is-open');document.getElementById('cart-overlay').classList.remove('is-open');document.body.style.overflow=''">Thanh Toán</a>
+    </div>
+  </div>
+
+  <div class="modal auth-modal" id="auth-modal">
+    <div class="modal__content">
+      <div class="modal__header">
+        <h2 class="modal__title"><i data-lucide="gem" class="logo-icon-modal"></i> SoftZone</h2>
+        <button class="modal__close" data-action="closeModal"><i data-lucide="x"></i></button>
+      </div>
+      <div id="auth-modal-content"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/playground.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

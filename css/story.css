@@ -1,0 +1,1385 @@
+/* ============================================================
+   SoftZone — Scroll Storytelling Styling (css/story.css)
+   ============================================================ */
+
+html {
+  scroll-behavior: auto !important;
+}
+
+:root {
+  --header-height: 72px;
+  --page-padding-x: clamp(24px, 6vw, 104px);
+  --stage-padding-top: calc(var(--header-height) + 32px);
+  --stage-padding-bottom: 48px;
+
+  /* Premium contrast text colors */
+  --text-white-pure: rgba(255, 255, 255, 0.98);
+  --text-white-secondary: rgba(220, 218, 232, 0.76);
+  --text-white-muted: rgba(180, 178, 195, 0.5);
+
+  /* Central Core Sizes */
+  --core-size: clamp(380px, 28vw, 480px);
+  --core-size-tablet: clamp(320px, 25vw, 400px);
+  --core-size-mobile: clamp(230px, 60vw, 300px);
+
+  /* Orbit Radius */
+  --orbit-radius: calc(var(--core-size) * 0.45);
+  --orbit-radius-tablet: calc(var(--core-size-tablet) * 0.44);
+  --orbit-radius-mobile: calc(var(--core-size-mobile) * 0.42);
+}
+
+.automation-story {
+  position: relative;
+  width: 100%;
+  min-height: 1100vh; /* Increased scroll length for comfortable reading holds */
+}
+
+/* Responsive min-height for story container */
+@media (max-width: 1024px) {
+  .automation-story { min-height: 850vh; }
+}
+@media (max-width: 768px) {
+  .automation-story { min-height: 600vh; }
+}
+
+.automation-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #040208;
+}
+
+/* ============================================================
+   Stage Layers
+   ============================================================ */
+.stage-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.layer--bg {
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, rgba(12, 8, 24, 0.6) 0%, rgba(4, 2, 8, 1) 100%);
+}
+
+.layer--particles {
+  z-index: 2;
+  opacity: 0.5;
+}
+
+.layer--far {
+  z-index: 3;
+}
+
+.layer--mid {
+  z-index: 4;
+}
+
+.layer--core {
+  z-index: 5;
+  position: absolute;
+  left: var(--core-x, 72%);
+  top: var(--core-y, 54%);
+  transform: translate(-50%, -50%);
+  width: var(--core-size);
+  height: var(--core-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Let pointer events pass to page, children will enable pointer-events */
+}
+
+@media (max-width: 1024px) {
+  .layer--core {
+    width: var(--core-size-tablet);
+    height: var(--core-size-tablet);
+  }
+}
+@media (max-width: 768px) {
+  .layer--core {
+    width: var(--core-size-mobile);
+    height: var(--core-size-mobile);
+  }
+}
+
+.layer--near {
+  z-index: 6;
+}
+
+/* ============================================================
+   Atmospheric Elements & Grid
+   ============================================================ */
+.digital-grid {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center;
+  transform: perspective(600px) rotateX(55deg);
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.hologram-fog {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 15% 25%, rgba(34, 211, 238, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(124, 58, 237, 0.06) 0%, transparent 55%);
+  filter: blur(32px);
+  mix-blend-mode: screen;
+}
+
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+}
+
+/* ============================================================
+   Scene Containers & Alternating Grid Layout
+   ============================================================ */
+.story-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  padding: var(--stage-padding-top) var(--page-padding-x) var(--stage-padding-bottom);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: none;
+}
+
+.story-scene.is-current,
+.story-scene.is-adjacent {
+  will-change: transform, opacity;
+}
+
+/* Grid splits for alternate layout aesthetics on desktop */
+@media (min-width: 1025px) {
+  .story-scene.scene--split,
+  .story-scene.scene--split-rev {
+    grid-template-columns:
+      minmax(0, 1.05fr)
+      minmax(360px, 0.95fr);
+    column-gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+  }
+  .story-scene.scene--center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .story-scene.scene--split .scene-text {
+    text-align: left;
+  }
+  .story-scene.scene--split-rev .scene-text {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+/* Scene Typography */
+.scene-text {
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 680px;
+  min-width: 0;
+  position: relative;
+}
+
+.scene-label {
+  align-self: flex-start;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  background: rgba(34, 211, 238, 0.08);
+  padding: 0.35rem 0.9rem;
+  border-radius: 99px;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+}
+
+.story-scene.scene--center .scene-label {
+  align-self: center;
+}
+
+.hero-title {
+  max-width: 760px;
+  font-family: var(--font-heading);
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: var(--text-white-pure);
+  margin-bottom: 1.5rem;
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  text-wrap: balance;
+}
+
+.scene-title {
+  max-width: 720px;
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4.2vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--text-white-pure);
+  margin-bottom: 1.5rem;
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  text-wrap: balance;
+}
+
+.scene-title span {
+  background: linear-gradient(to right, #fff, var(--cyan), var(--purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.scene-description {
+  max-width: 600px;
+  font-size: clamp(15px, 1.25vw, 19px);
+  line-height: 1.6;
+  color: var(--text-white-secondary);
+  margin-bottom: 2rem;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.story-scene.scene--center .scene-description {
+  margin-inline: auto;
+}
+
+/* Hero Stats Bar */
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1.5rem;
+}
+
+.hero-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-num {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.stat-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--purple-light);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-white-secondary);
+}
+
+/* CTA buttons */
+.final-cta {
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.final-cta .btn {
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Automation Core & Orbit Nodes
+   ============================================================ */
+.core-scroll-layer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.core-floating-layer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: coreFloat 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.core-mouse-layer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.automation-core {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.core-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--purple) 0%, transparent 68%);
+  filter: blur(12px);
+  opacity: 0.55;
+  animation: coreGlowPulse 4s infinite alternate ease-in-out;
+  transition: background 0.5s ease;
+}
+
+.core-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(34, 211, 238, 0.2);
+  border-top-color: var(--cyan);
+  border-bottom-color: var(--purple-light);
+  animation: coreRotate 14s linear infinite;
+}
+
+.core-ring--inner {
+  width: 78%;
+  height: 78%;
+  border: 1.5px dashed rgba(168, 85, 247, 0.3);
+  border-left-color: var(--purple-light);
+  border-right-color: var(--cyan);
+  animation: coreRotate 9s linear infinite reverse;
+}
+
+.core-center {
+  position: relative;
+  width: 44%;
+  height: 44%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--purple) 55%, var(--bg-deep) 100%);
+  box-shadow: 
+    0 0 35px rgba(124, 58, 237, 0.5),
+    inset 0 0 15px rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: box-shadow 0.4s ease;
+}
+
+.core-center i {
+  color: #fff;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+/* Orbit Nodes Styling */
+.core-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  --orbit-r: var(--orbit-radius);
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(var(--orbit-r)) rotate(calc(-1 * var(--angle)));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(12, 8, 24, 0.94);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.04);
+  pointer-events: auto; /* Active for interactions */
+}
+
+@media (max-width: 1024px) {
+  .core-node {
+    --orbit-r: var(--orbit-radius-tablet);
+    width: 44px;
+    height: 44px;
+  }
+}
+@media (max-width: 768px) {
+  .core-node {
+    --orbit-r: var(--orbit-radius-mobile);
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.core-node i {
+  width: 20px;
+  height: 20px;
+  color: var(--text-white-secondary);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .core-node i {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.core-node:hover {
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(var(--orbit-r)) rotate(calc(-1 * var(--angle))) scale(1.15);
+  border-color: var(--node-color);
+  box-shadow: 0 0 20px var(--node-glow);
+}
+
+.core-node:hover i {
+  color: var(--node-color);
+  transform: scale(1.1);
+}
+
+/* Map specific colors for each orbit node type */
+.core-node[data-node="email"] { --node-color: var(--purple-light); --node-glow: rgba(168, 85, 247, 0.5); }
+.core-node[data-node="ai"] { --node-color: var(--cyan); --node-glow: rgba(34, 211, 238, 0.5); }
+.core-node[data-node="database"] { --node-color: var(--blue); --node-glow: rgba(59, 130, 246, 0.5); }
+.core-node[data-node="crm"] { --node-color: var(--green); --node-glow: rgba(52, 211, 153, 0.5); }
+.core-node[data-node="social"] { --node-color: var(--red); --node-glow: rgba(251, 113, 133, 0.5); }
+.core-node[data-node="analytics"] { --node-color: #f59e0b; --node-glow: rgba(245, 158, 11, 0.5); }
+
+/* Tooltip Orbit Node */
+.core-node-tooltip {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: rgba(8, 5, 18, 0.95);
+  border: 1px solid var(--border-active);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+}
+
+.core-node:hover .core-node-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Orbit Path SVG lines */
+.core-svg-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.orbit-path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.035);
+  stroke-width: 1.5;
+  stroke-dasharray: 4, 8;
+  transform-origin: center;
+  animation: coreRotate 60s linear infinite;
+}
+
+@keyframes coreGlowPulse {
+  0% { opacity: 0.45; filter: blur(10px); transform: scale(0.95); }
+  100% { opacity: 0.75; filter: blur(18px); transform: scale(1.05); }
+}
+
+@keyframes coreRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes coreFloat {
+  0% { transform: translateY(-6px); }
+  100% { transform: translateY(6px); }
+}
+
+/* ============================================================
+   Scene 2: Manual Work Chaos Cards
+   ============================================================ */
+.chaos-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.task-card {
+  position: absolute;
+  background: rgba(14, 10, 28, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 8px rgba(255, 255, 255, 0.02);
+  width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  will-change: transform, opacity;
+  z-index: 10;
+  pointer-events: auto;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.task-card:hover {
+  border-color: var(--card-color, var(--purple-light));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--card-color-glow, rgba(168, 85, 247, 0.25));
+  transform: translateY(-2px);
+}
+
+.task-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-card__icon i {
+  width: 18px;
+  height: 18px;
+}
+
+.task-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.task-card__title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  font-family: var(--font-heading);
+}
+
+.task-card__status {
+  font-size: 0.7rem;
+  color: var(--text-white-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.task-card__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+/* Card classes with custom colors */
+.task-card--crm { --card-color: var(--cyan); --card-color-glow: rgba(34, 211, 238, 0.35); }
+.task-card--crm .task-card__icon { color: var(--cyan); background: rgba(34, 211, 238, 0.1); }
+.task-card--crm .task-card__status-dot { background: var(--cyan); }
+
+.task-card--email { --card-color: var(--purple-light); --card-color-glow: rgba(168, 85, 247, 0.35); }
+.task-card--email .task-card__icon { color: var(--purple-light); background: rgba(168, 85, 247, 0.1); }
+.task-card--email .task-card__status-dot { background: #f59e0b; }
+
+.task-card--sheet { --card-color: var(--green); --card-color-glow: rgba(52, 211, 153, 0.35); }
+.task-card--sheet .task-card__icon { color: var(--green); background: rgba(52, 211, 153, 0.1); }
+.task-card--sheet .task-card__status-dot { background: var(--green); }
+
+.task-card--alert { --card-color: var(--red); --card-color-glow: rgba(251, 113, 133, 0.35); }
+.task-card--alert .task-card__icon { color: var(--red); background: rgba(251, 113, 133, 0.1); }
+.task-card--alert .task-card__status-dot { background: var(--red); }
+
+.task-card--cal { --card-color: #f59e0b; --card-color-glow: rgba(245, 158, 11, 0.35); }
+.task-card--cal .task-card__icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.task-card--cal .task-card__status-dot { background: #f59e0b; }
+
+/* ============================================================
+   Scene 3: Workflow Auto
+   ============================================================ */
+.flow-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2rem auto 0 auto;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.flow-node {
+  background: rgba(14, 10, 28, 0.94);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  width: 85px;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.03);
+  position: relative;
+  z-index: 2;
+  will-change: transform, border-color, box-shadow;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flow-node i {
+  width: 32px;
+  height: 32px;
+  color: var(--text-white-secondary);
+}
+
+.flow-node.is-active {
+  border-color: var(--cyan);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.45), inset 0 0 15px rgba(34, 211, 238, 0.15);
+  color: var(--cyan);
+  transform: scale(1.1);
+}
+
+.flow-node.is-active i {
+  color: var(--cyan);
+}
+
+.flow-node.is-completed {
+  border-color: var(--green);
+  box-shadow: 0 0 25px rgba(52, 211, 153, 0.35), inset 0 0 15px rgba(52, 211, 153, 0.1);
+  color: var(--green);
+}
+
+.flow-node.is-completed i {
+  color: var(--green);
+}
+
+.flow-node__label {
+  position: absolute;
+  top: 95px;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-white-secondary);
+  font-family: var(--font-heading);
+  text-shadow: 0 2px 8px rgba(4, 2, 8, 0.95);
+}
+
+.flow-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.flow-connection-line {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 2;
+  fill: none;
+}
+
+.flow-connection-pulse {
+  stroke: var(--cyan);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-dasharray: 12, 120;
+  stroke-dashoffset: 0;
+}
+
+/* ============================================================
+   Scene 4: Ecosystem Connection
+   ============================================================ */
+.ecosystem-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 380px;
+  margin-top: 1rem;
+}
+
+.eco-app {
+  position: absolute;
+  background: rgba(14, 10, 28, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  will-change: transform, border-color;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.eco-app i {
+  width: 24px;
+  height: 24px;
+  color: var(--text-white-secondary);
+}
+
+#eco-app-1 { color: var(--cyan); border-color: rgba(34, 211, 238, 0.4); }
+#eco-app-1.connected { box-shadow: 0 0 25px rgba(34, 211, 238, 0.4), inset 0 0 10px rgba(34, 211, 238, 0.15); border-color: var(--cyan); }
+
+#eco-app-2 { color: var(--purple-light); border-color: rgba(168, 85, 247, 0.4); }
+#eco-app-2.connected { box-shadow: 0 0 25px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.15); border-color: var(--purple-light); }
+
+#eco-app-3 { color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); }
+#eco-app-3.connected { box-shadow: 0 0 25px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
+
+#eco-app-4 { color: var(--green); border-color: rgba(52, 211, 153, 0.4); }
+#eco-app-4.connected { box-shadow: 0 0 25px rgba(52, 211, 153, 0.4), inset 0 0 10px rgba(52, 211, 153, 0.15); border-color: var(--green); }
+
+#eco-app-5 { color: var(--blue); border-color: rgba(59, 130, 246, 0.4); }
+#eco-app-5.connected { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.15); border-color: var(--blue); }
+
+#eco-app-6 { color: var(--red); border-color: rgba(251, 113, 133, 0.4); }
+#eco-app-6.connected { box-shadow: 0 0 25px rgba(251, 113, 133, 0.4), inset 0 0 10px rgba(251, 113, 133, 0.15); border-color: var(--red); }
+
+/* ============================================================
+   Scene 5: AI Data Processing
+   ============================================================ */
+.prompt-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-active);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-heading);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--glow-purple);
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.prompt-icon {
+  color: var(--purple-light);
+  width: 22px;
+  height: 22px;
+}
+
+.prompt-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  border-right: 2px solid var(--purple-light);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  will-change: width;
+}
+
+.ai-output-cards {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  z-index: 10;
+}
+
+.ai-card {
+  background: rgba(14, 10, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  width: 140px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-card i {
+  width: 26px;
+  height: 26px;
+}
+
+.ai-card__title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ============================================================
+   Scene 7: Featured Showcase & Checkout Detail Panel
+   ============================================================ */
+.featured-showcase-container {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  max-width: 1000px;
+  width: 100%;
+  align-items: center;
+  margin-top: 1rem;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.showcase-left {
+  width: 100%;
+}
+
+.showcase-right {
+  width: 100%;
+}
+
+/* ============================================================
+   Story Dot Progress Indicator (Desktop Side Navigation)
+   ============================================================ */
+.story-progress {
+  position: absolute;
+  right: clamp(20px, 3.5vw, 60px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+@media (max-width: 1024px) {
+  .story-progress {
+    display: none;
+  }
+}
+
+.progress-dot-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.progress-dot-label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  color: var(--text-white-muted);
+  opacity: 0;
+  transform: translateX(8px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.progress-dot-wrapper:hover .progress-dot-label,
+.progress-dot-wrapper.is-active .progress-dot-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.progress-dot-wrapper.is-active .progress-dot-label {
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.progress-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-white-muted);
+  opacity: 0.5;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+}
+
+.progress-dot-wrapper:hover .progress-dot {
+  opacity: 0.9;
+  transform: scale(1.3);
+  background: #fff;
+}
+
+.progress-dot-wrapper.is-active .progress-dot {
+  opacity: 1;
+  background: var(--cyan);
+  transform: scale(1.5);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+/* Mobile Horizontal Progress Bar under header */
+.story-progress-mobile {
+  position: absolute;
+  top: var(--header-height);
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  z-index: 99;
+  display: none;
+}
+
+.story-progress-mobile-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, var(--purple), var(--cyan));
+  transition: width 0.1s ease;
+}
+
+@media (max-width: 1024px) {
+  .story-progress-mobile {
+    display: block;
+  }
+}
+
+/* ============================================================
+   Interactive Orbit Node Click Info Panel (Slide-out Detail)
+   ============================================================ */
+.core-detail-panel {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 330px;
+  background: rgba(12, 8, 24, 0.96);
+  border: 1px solid var(--border-active);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--glow-purple), 0 15px 40px rgba(0, 0, 0, 0.8);
+  z-index: 101;
+  transform: translateX(130%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  pointer-events: auto;
+}
+
+.core-detail-panel.is-open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.core-detail-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.core-detail-panel__title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.core-detail-panel__title i {
+  width: 20px;
+  height: 20px;
+  color: var(--cyan);
+}
+
+.core-detail-panel__close {
+  cursor: pointer;
+  color: var(--text-white-secondary);
+  transition: color 0.2s ease;
+}
+
+.core-detail-panel__close:hover {
+  color: #fff;
+}
+
+.core-detail-panel__desc {
+  font-size: 0.8rem;
+  color: var(--text-white-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.core-detail-panel__tool {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.core-detail-panel__tool-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.core-detail-panel__tool-name {
+  font-weight: 600;
+  color: #fff;
+  font-family: var(--font-heading);
+}
+
+.core-detail-panel__tool-price {
+  color: var(--cyan);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Parallax Background Layers
+   ============================================================ */
+.parallax-item {
+  position: absolute;
+  will-change: transform;
+}
+
+.blur-dot {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+.blur-dot--purple {
+  background: var(--purple);
+  width: 320px;
+  height: 320px;
+}
+
+.blur-dot--cyan {
+  background: var(--cyan);
+  width: 260px;
+  height: 260px;
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .automation-story {
+    min-height: auto !important;
+  }
+  .automation-stage {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 3rem 1.5rem !important;
+  }
+  .story-scene {
+    position: relative !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    height: auto !important;
+    padding: 3rem 0 !important;
+  }
+  .digital-grid,
+  .hologram-fog,
+  .scanlines,
+  .core-ring,
+  .core-ring--inner,
+  .flow-connection-pulse {
+    animation: none !important;
+    transform: none !important;
+    display: none !important;
+  }
+  .stage-layer {
+    position: relative !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   Responsive Laptop (1366×768) and Tablet (1024×768)
+   ============================================================ */
+@media (max-width: 1366px) {
+  .scene-description {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-stats {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .story-scene {
+    grid-template-columns: 1fr !important;
+    align-content: center;
+    text-align: center;
+    padding: var(--stage-padding-top) 2rem var(--stage-padding-bottom);
+  }
+
+  .scene-text {
+    align-items: center;
+    text-align: center !important;
+    grid-column: 1 !important;
+  }
+
+  .scene-label {
+    align-self: center !important;
+  }
+
+  .hero-title, .scene-title {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .scene-description {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .hero-stats {
+    justify-content: center;
+  }
+
+  .final-cta {
+    justify-content: center;
+  }
+
+  .featured-showcase-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 500px;
+    margin: 1.5rem auto 0 auto;
+  }
+
+  .core-detail-panel {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    transform: translateY(100%);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding-bottom: 28px;
+    z-index: 1000;
+  }
+
+  .core-detail-panel.is-open {
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Mobile Adjustments (max-width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .scene-description {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .chaos-container {
+    min-height: 280px;
+    margin-top: 0.5rem;
+  }
+
+  .task-card {
+    width: 175px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .task-card__icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .task-card__icon i {
+    width: 14px;
+    height: 14px;
+  }
+
+  .task-card__title {
+    font-size: 0.7rem;
+  }
+
+  .task-card__status {
+    font-size: 0.62rem;
+  }
+
+  .flow-container {
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .flow-node {
+    width: 56px;
+    height: 56px;
+  }
+
+  .flow-node i {
+    width: 20px;
+    height: 20px;
+  }
+
+  .flow-node__label {
+    top: 62px;
+    font-size: 0.65rem;
+  }
+
+  .flow-svg-overlay {
+    display: none; /* Hide svg bezier paths on mobile to avoid weird shapes */
+  }
+
+  .ecosystem-container {
+    height: 260px;
+    margin-top: 0.5rem;
+  }
+
+  .eco-app {
+    width: 44px;
+    height: 44px;
+  }
+
+  .eco-app i {
+    width: 16px;
+    height: 16px;
+  }
+
+  .prompt-box {
+    padding: 0.75rem 1rem;
+    margin: 0 auto 1rem auto;
+    max-width: 320px;
+  }
+
+  .prompt-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .prompt-text {
+    font-size: 0.8rem;
+  }
+
+  .ai-output-cards {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .ai-card {
+    width: 90px;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .ai-card i {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ai-card__title {
+    font-size: 0.65rem;
+  }
+
+  .hero-stats {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    border: none;
+    padding-top: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .hero-stat-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-num {
+    font-size: 1.1rem;
+  }
+
+  .stat-icon {
+    margin-bottom: 0;
+  }
+
+  .final-cta {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .final-cta .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
