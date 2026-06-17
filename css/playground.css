@@ -846,3 +846,16 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ============================================================
+   Hide Desktop Playground on Mobile
+   ============================================================ */
+@media (max-width: 767px) {
+  .playground-container {
+    display: none !important;
+  }
+
+  .mobile-playground-section {
+    display: none !important;
+  }
+}

@@ -94,11 +94,12 @@ SoftwareStore.App = (() => {
         // Initialize cinematic scroll storytelling & playground
         setTimeout(() => {
           SoftwareStore.Story.init();
-          SoftwareStore.Playground.init();
           
-          const isMobile = window.innerWidth <= 768;
-          const viewportId = isMobile ? 'mobile-playground-viewport' : 'playground-viewport';
-          SoftwareStore.Playground.render(viewportId);
+          const isMobile = window.matchMedia('(max-width: 767px)').matches;
+          if (!isMobile) {
+            SoftwareStore.Playground.init();
+            SoftwareStore.Playground.render('playground-viewport');
+          }
           
           // Check for auto-run product template redirect
           const autoRunId = localStorage.getItem('softZone_autoRunProduct');

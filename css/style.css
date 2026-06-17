@@ -344,3 +344,83 @@ small {
   background: rgba(108, 92, 231, 0.35);
   color: #fff;
 }
+
+/* ============================================================
+   9. Mobile Base Fixes
+   ============================================================ */
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --nav-height: 64px;
+  }
+
+  .nav {
+    height: var(--nav-height);
+    background: rgba(5, 3, 14, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .nav__container {
+    padding-inline: 16px;
+  }
+
+  .nav__logo-text {
+    font-size: 1.15rem;
+  }
+
+  .nav__cart-btn,
+  .nav__mobile-toggle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav__mobile-menu.is-open {
+    background: rgba(5, 3, 14, 0.98);
+  }
+
+  .nav__mobile-link {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+
+  .container {
+    padding-inline: 16px;
+  }
+
+  .main-content {
+    min-width: 0;
+  }
+}
+
+/* ============================================================
+   10. Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   11. Touch Device Hover Fix
+   ============================================================ */
+@media (hover: none) {
+  .btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

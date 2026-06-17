@@ -1817,3 +1817,71 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
+
+/* ============================================================
+   Mobile Component Overrides
+   ============================================================ */
+@media (max-width: 767px) {
+  .product-card {
+    width: 100%;
+  }
+
+  .product-card__image {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+
+  .product-card__body {
+    padding: 16px;
+  }
+
+  .product-card__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .product-card__actions .btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .cart-panel {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+  }
+
+  .cart-panel__footer {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .featured-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal__content {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+
+  .section {
+    padding: 2.5rem 0;
+  }
+}
+
+@media (hover: none) {
+  .product-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

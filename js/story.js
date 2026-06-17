@@ -83,6 +83,8 @@ SoftwareStore.Story = (() => {
 
   // Render the HTML structure for the entire scroll stage
   function render() {
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    if (isMobile) return renderMobile();
     const { Data, Components } = SoftwareStore;
     
     // Featured product for Scene 7 (CRM Automation Pro)
@@ -1078,15 +1080,507 @@ core.init({
     }
   }
 
+  function renderMobile() {
+    const { Data, Components } = SoftwareStore;
+    const statsList = Data.stats || [];
+    const featuredProduct = Data.products.find(p => p.id === 21) || Data.products[0];
+    const proPlan = featuredProduct.plans.find(p => p.type === 'pro') || featuredProduct.plans[0];
+    const hasDiscount = featuredProduct.discount && featuredProduct.discount > 0;
+    const discountedPrice = hasDiscount ? proPlan.price * (1 - featuredProduct.discount / 100) : proPlan.price;
+
+    return `
+      <section class="mobile-story" aria-label="SoftZone Mobile Lite Experience">
+
+        <!-- MOBILE HERO -->
+        <div class="mobile-scene mobile-hero">
+          <div class="mobile-hero__content">
+            <span class="mobile-eyebrow">AI & AUTOMATION MARKETPLACE</span>
+            <h1 class="mobile-hero__title">
+              Tự động hóa công việc.<br>
+              <span class="text-gradient">Làm nhiều hơn với ít thao tác hơn.</span>
+            </h1>
+            <p class="mobile-hero__description">
+              Khám phá các tool AI và phần mềm giúp xử lý công việc nhanh hơn, đơn giản hơn và hiệu quả hơn.
+            </p>
+            <div class="mobile-hero__actions">
+              <a href="#/store" class="btn btn--primary">Khám phá công cụ</a>
+              <button class="btn btn--outline" data-scroll-to="mobile-demo">Xem demo</button>
+            </div>
+          </div>
+
+          <div class="mobile-core-visual">
+            <div class="mobile-core">
+              <div class="mobile-core__glow"></div>
+              <div class="mobile-core__ring"></div>
+              <div class="mobile-core__ring mobile-core__ring--inner"></div>
+              <div class="mobile-core__center">
+                <i data-lucide="cpu" style="width:50%;height:50%;color:#fff;"></i>
+              </div>
+              <div class="mobile-core-node" style="--m-angle:0deg;"><i data-lucide="mail"></i></div>
+              <div class="mobile-core-node" style="--m-angle:90deg;"><i data-lucide="brain"></i></div>
+              <div class="mobile-core-node" style="--m-angle:180deg;"><i data-lucide="database"></i></div>
+              <div class="mobile-core-node" style="--m-angle:270deg;"><i data-lucide="users"></i></div>
+            </div>
+          </div>
+
+          <div class="mobile-hero__stats">
+            ${statsList.map(st => `
+              <div class="mobile-stat">
+                <strong class="mobile-stat__value">${st.value}</strong>
+                <span class="mobile-stat__label">${st.label}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- MOBILE PROBLEMS -->
+        <div class="mobile-scene mobile-problems">
+          <div class="mobile-scene__header mobile-reveal">
+            <span class="mobile-eyebrow">Quá tải quy trình thủ công</span>
+            <h2 class="mobile-scene__title">Bạn đang dành quá nhiều thời gian<br><span class="text-gradient">cho những việc có thể tự động hóa.</span></h2>
+            <p class="mobile-scene__description">Email, dữ liệu, báo cáo và phản hồi khách hàng có thể được xử lý tự động.</p>
+          </div>
+          <div class="mobile-task-list">
+            <article class="mobile-task-card mobile-reveal" style="--reveal-delay:0ms">
+              <div class="mobile-task-card__icon" style="color:var(--cyan);background:rgba(34,211,238,0.1);"><i data-lucide="users"></i></div>
+              <div class="mobile-task-card__body">
+                <span class="mobile-task-card__title">Lead Form đăng ký</span>
+                <span class="mobile-task-card__status"><span class="mobile-task-card__dot" style="background:var(--cyan)"></span>Đang chờ xử lý...</span>
+              </div>
+            </article>
+            <article class="mobile-task-card mobile-reveal" style="--reveal-delay:80ms">
+              <div class="mobile-task-card__icon" style="color:var(--purple-light);background:rgba(168,85,247,0.1);"><i data-lucide="mail"></i></div>
+              <div class="mobile-task-card__body">
+                <span class="mobile-task-card__title">Gửi mail tư vấn tay</span>
+                <span class="mobile-task-card__status"><span class="mobile-task-card__dot" style="background:#f59e0b"></span>Đang soạn thảo...</span>
+              </div>
+            </article>
+            <article class="mobile-task-card mobile-reveal" style="--reveal-delay:160ms">
+              <div class="mobile-task-card__icon" style="color:var(--green);background:rgba(52,211,153,0.1);"><i data-lucide="file-text"></i></div>
+              <div class="mobile-task-card__body">
+                <span class="mobile-task-card__title">Nhập tay báo cáo ngày</span>
+                <span class="mobile-task-card__status"><span class="mobile-task-card__dot" style="background:var(--green)"></span>Chưa đồng bộ</span>
+              </div>
+            </article>
+            <article class="mobile-task-card mobile-reveal" style="--reveal-delay:240ms">
+              <div class="mobile-task-card__icon" style="color:var(--red);background:rgba(251,113,133,0.1);"><i data-lucide="alert-triangle"></i></div>
+              <div class="mobile-task-card__body">
+                <span class="mobile-task-card__title">Cảnh báo: 52 leads tồn</span>
+                <span class="mobile-task-card__status"><span class="mobile-task-card__dot" style="background:var(--red)"></span>Hệ thống quá tải</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- MOBILE WORKFLOW TIMELINE -->
+        <div class="mobile-scene mobile-workflow-scene">
+          <div class="mobile-scene__header mobile-reveal">
+            <span class="mobile-eyebrow">Sắp xếp hệ thống</span>
+            <h2 class="mobile-scene__title">Thiết lập một lần.<br><span class="text-gradient">Hệ thống vận hành liên tục.</span></h2>
+            <p class="mobile-scene__description">Kết nối các ứng dụng và biến quy trình thủ công thành chuỗi tự động hóa 24/7.</p>
+          </div>
+          <div class="mobile-workflow">
+            <article class="mobile-workflow-step mobile-reveal" style="--reveal-delay:0ms">
+              <div class="mobile-workflow-step__number">01</div>
+              <div class="mobile-workflow-step__content">
+                <strong>Nhận biểu mẫu</strong>
+                <p>Tiếp nhận dữ liệu từ form đăng ký khách hàng.</p>
+              </div>
+            </article>
+            <div class="mobile-workflow-line"></div>
+            <article class="mobile-workflow-step mobile-reveal" style="--reveal-delay:100ms">
+              <div class="mobile-workflow-step__number">02</div>
+              <div class="mobile-workflow-step__content">
+                <strong>AI Phân tích</strong>
+                <p>AI tự động phân loại lead và chấm điểm tiềm năng.</p>
+              </div>
+            </article>
+            <div class="mobile-workflow-line"></div>
+            <article class="mobile-workflow-step mobile-reveal" style="--reveal-delay:200ms">
+              <div class="mobile-workflow-step__number">03</div>
+              <div class="mobile-workflow-step__content">
+                <strong>Cập nhật CRM</strong>
+                <p>Dữ liệu được đồng bộ vào hệ thống CRM tự động.</p>
+              </div>
+            </article>
+            <div class="mobile-workflow-line"></div>
+            <article class="mobile-workflow-step mobile-reveal" style="--reveal-delay:300ms">
+              <div class="mobile-workflow-step__number">04</div>
+              <div class="mobile-workflow-step__content">
+                <strong>Gửi Email tự động</strong>
+                <p>Email chào mừng và tư vấn được gửi ngay lập tức.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- MOBILE AI FLOW -->
+        <div class="mobile-scene mobile-ai-scene">
+          <div class="mobile-scene__header mobile-reveal">
+            <span class="mobile-eyebrow">Trợ lý AI tự động</span>
+            <h2 class="mobile-scene__title">AI không chỉ hỗ trợ.<br><span class="text-gradient">AI làm việc cùng bạn.</span></h2>
+            <p class="mobile-scene__description">Giao việc cho AI, hệ thống tự động suy luận, trích xuất dữ liệu và tạo hành động tối ưu.</p>
+          </div>
+          <div class="mobile-ai-flow">
+            <div class="mobile-ai-prompt mobile-reveal">
+              <i data-lucide="sparkles" style="color:var(--purple-light);width:20px;height:20px;flex-shrink:0;"></i>
+              <span class="mobile-ai-prompt__text">Xử lý dữ liệu CRM bằng AI...</span>
+            </div>
+            <div class="mobile-ai-core-mini mobile-reveal">
+              <div class="mobile-core mobile-core--small">
+                <div class="mobile-core__glow"></div>
+                <div class="mobile-core__ring"></div>
+                <div class="mobile-core__center">
+                  <i data-lucide="sparkles" style="width:50%;height:50%;color:#fff;"></i>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-ai-results">
+              <article class="mobile-ai-result mobile-reveal" style="--reveal-delay:0ms">
+                <i data-lucide="pie-chart" style="color:var(--cyan);width:22px;height:22px;"></i>
+                <span>Phân tích Lead</span>
+              </article>
+              <article class="mobile-ai-result mobile-reveal" style="--reveal-delay:100ms">
+                <i data-lucide="pen-tool" style="color:var(--purple-light);width:22px;height:22px;"></i>
+                <span>Viết Mail Draft</span>
+              </article>
+              <article class="mobile-ai-result mobile-reveal" style="--reveal-delay:200ms">
+                <i data-lucide="check-square" style="color:var(--green);width:22px;height:22px;"></i>
+                <span>Tạo Task CRM</span>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOBILE AUTOMATION DEMO -->
+        <section id="mobile-demo" class="mobile-scene mobile-automation-demo">
+          <div class="mobile-demo__header mobile-reveal">
+            <span class="mobile-eyebrow">Sân chơi tự động hóa</span>
+            <h2 class="mobile-scene__title">Workflow <span class="text-gradient">Demo</span></h2>
+          </div>
+          <select class="mobile-demo__template" id="mobile-demo-template">
+            <option value="customer">Chăm sóc khách hàng</option>
+            <option value="marketing">Marketing Automation</option>
+            <option value="content">Đăng bài tự động</option>
+          </select>
+          <div class="mobile-demo__steps" id="mobile-demo-steps">
+            <div class="mobile-demo-step" data-step="0">
+              <div class="mobile-demo-step__indicator"></div>
+              <div class="mobile-demo-step__content"><i data-lucide="file-text"></i><span>Nhận biểu mẫu đăng ký</span></div>
+              <button class="mobile-demo-step__toggle" data-step-toggle="0">ON</button>
+            </div>
+            <div class="mobile-demo-step" data-step="1">
+              <div class="mobile-demo-step__indicator"></div>
+              <div class="mobile-demo-step__content"><i data-lucide="brain"></i><span>AI phân tích dữ liệu</span></div>
+              <button class="mobile-demo-step__toggle" data-step-toggle="1">ON</button>
+            </div>
+            <div class="mobile-demo-step" data-step="2">
+              <div class="mobile-demo-step__indicator"></div>
+              <div class="mobile-demo-step__content"><i data-lucide="database"></i><span>Cập nhật CRM</span></div>
+              <button class="mobile-demo-step__toggle" data-step-toggle="2">ON</button>
+            </div>
+            <div class="mobile-demo-step" data-step="3">
+              <div class="mobile-demo-step__indicator"></div>
+              <div class="mobile-demo-step__content"><i data-lucide="send"></i><span>Gửi email tự động</span></div>
+              <button class="mobile-demo-step__toggle" data-step-toggle="3">ON</button>
+            </div>
+            <div class="mobile-demo-step" data-step="4">
+              <div class="mobile-demo-step__indicator"></div>
+              <div class="mobile-demo-step__content"><i data-lucide="bar-chart-3"></i><span>Tạo báo cáo tổng hợp</span></div>
+              <button class="mobile-demo-step__toggle" data-step-toggle="4">ON</button>
+            </div>
+          </div>
+          <button class="btn btn--primary mobile-demo__run" id="mobile-demo-run">Chạy thử workflow</button>
+          <div class="mobile-demo__progress" id="mobile-demo-progress">
+            <div class="mobile-demo__progress-bar" id="mobile-demo-progress-bar"></div>
+          </div>
+          <div class="mobile-demo__result" id="mobile-demo-result"></div>
+        </section>
+
+        <!-- MOBILE MARKETPLACE + CTA -->
+        <div class="mobile-scene mobile-marketplace">
+          <div class="mobile-scene__header mobile-reveal">
+            <span class="mobile-eyebrow">Sản phẩm khuyên dùng</span>
+            <h2 class="mobile-scene__title">Khám phá giải pháp<br><span class="text-gradient">CRM Automation Pro</span></h2>
+            <p class="mobile-scene__description">Bản quyền CRM tích hợp AI, tự động kết nối leads, gửi tin chăm sóc khách hàng 24/7.</p>
+          </div>
+
+          <div class="mobile-featured-product mobile-reveal">
+            <div class="mobile-featured-product__image" style="background:linear-gradient(135deg, ${featuredProduct.color}20, ${featuredProduct.color}50);">
+              <i data-lucide="users" style="width:48px;height:48px;color:var(--cyan);"></i>
+              <span class="badge badge--danger" style="position:absolute;top:12px;left:12px;">Đề xuất</span>
+            </div>
+            <div class="mobile-featured-product__body">
+              <span style="font-size:0.72rem;color:var(--text-secondary);">Doanh nghiệp & Tự động hóa</span>
+              <h3 style="font-size:1.1rem;margin:4px 0 8px;">${featuredProduct.name}</h3>
+              <div class="mobile-featured-product__price">
+                ${hasDiscount ? `<span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85rem;">${SoftwareStore.Utils.formatCurrency(proPlan.price)}</span>` : ''}
+                <span style="color:var(--cyan);font-size:1.4rem;font-weight:700;">${SoftwareStore.Utils.formatCurrency(discountedPrice)}</span>
+                <span style="font-size:0.75rem;color:var(--text-secondary);">/tháng</span>
+              </div>
+              <button class="btn btn--primary" style="width:100%;margin-top:12px;min-height:48px;"
+                data-action="addToCart" data-product-id="${featuredProduct.id}" data-plan="${proPlan.type}">
+                Mua Ngay Bản Quyền
+              </button>
+            </div>
+          </div>
+
+          <div class="mobile-category-links mobile-reveal">
+            <a href="#/store" class="mobile-category-link"><i data-lucide="zap" style="width:16px;"></i> Workflow Auto</a>
+            <a href="#/store" class="mobile-category-link"><i data-lucide="brain" style="width:16px;"></i> AI & Copilots</a>
+          </div>
+
+          <div class="mobile-final-cta mobile-reveal">
+            <a href="#/store" class="btn btn--primary" style="width:100%;min-height:52px;">Khám phá cửa hàng</a>
+            <a href="#/about" class="btn btn--outline" style="width:100%;min-height:48px;">Tìm hiểu thêm</a>
+          </div>
+        </div>
+
+      </section>
+    `;
+  }
+
+  // Mobile demo templates data
+  const MOBILE_DEMO_TEMPLATES = {
+    customer: [
+      { icon: 'file-text', label: 'Nhận biểu mẫu đăng ký' },
+      { icon: 'brain', label: 'AI phân tích dữ liệu' },
+      { icon: 'database', label: 'Cập nhật CRM' },
+      { icon: 'send', label: 'Gửi email tự động' },
+      { icon: 'bar-chart-3', label: 'Tạo báo cáo tổng hợp' }
+    ],
+    marketing: [
+      { icon: 'target', label: 'Xác định đối tượng' },
+      { icon: 'pen-tool', label: 'Tạo nội dung AI' },
+      { icon: 'share-2', label: 'Đăng đa kênh' },
+      { icon: 'bar-chart-3', label: 'Theo dõi hiệu quả' },
+      { icon: 'repeat', label: 'Tối ưu tự động' }
+    ],
+    content: [
+      { icon: 'edit-3', label: 'Soạn nội dung AI' },
+      { icon: 'image', label: 'Tạo hình ảnh' },
+      { icon: 'calendar', label: 'Lên lịch đăng' },
+      { icon: 'globe', label: 'Phát hành đa nền tảng' },
+      { icon: 'message-square', label: 'Trả lời comment AI' }
+    ]
+  };
+
+  let mobileObserver = null;
+  let mobileDemoTimer = null;
+  let mobileDemoRunning = false;
+
+  function initMobileStory() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // IntersectionObserver for reveal animations
+    const revealEls = document.querySelectorAll('.mobile-reveal');
+    if (revealEls.length > 0 && !reduceMotion) {
+      mobileObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = parseInt(entry.target.style.getPropertyValue('--reveal-delay') || '0');
+            setTimeout(() => {
+              entry.target.classList.add('is-visible');
+            }, delay);
+            mobileObserver.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '80px 0px', threshold: 0.08 });
+
+      revealEls.forEach(el => mobileObserver.observe(el));
+    } else {
+      // If reduced motion, show everything immediately
+      revealEls.forEach(el => el.classList.add('is-visible'));
+    }
+
+    // Scroll-to-demo button
+    document.querySelectorAll('[data-scroll-to="mobile-demo"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const demoEl = document.getElementById('mobile-demo');
+        if (demoEl) demoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Mobile demo template switcher
+    const templateSelect = document.getElementById('mobile-demo-template');
+    if (templateSelect) {
+      templateSelect.addEventListener('change', () => {
+        updateMobileDemoSteps(templateSelect.value);
+      });
+    }
+
+    // Mobile demo step toggles
+    document.querySelectorAll('[data-step-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isOn = btn.textContent === 'ON';
+        btn.textContent = isOn ? 'OFF' : 'ON';
+        btn.classList.toggle('is-off', isOn);
+      });
+    });
+
+    // Mobile demo run button
+    const runBtn = document.getElementById('mobile-demo-run');
+    if (runBtn) {
+      runBtn.addEventListener('click', runMobileDemo);
+    }
+  }
+
+  function updateMobileDemoSteps(templateKey) {
+    const template = MOBILE_DEMO_TEMPLATES[templateKey] || MOBILE_DEMO_TEMPLATES.customer;
+    const stepsContainer = document.getElementById('mobile-demo-steps');
+    if (!stepsContainer) return;
+
+    stepsContainer.innerHTML = template.map((step, idx) => `
+      <div class="mobile-demo-step" data-step="${idx}">
+        <div class="mobile-demo-step__indicator"></div>
+        <div class="mobile-demo-step__content"><i data-lucide="${step.icon}"></i><span>${step.label}</span></div>
+        <button class="mobile-demo-step__toggle" data-step-toggle="${idx}">ON</button>
+      </div>
+    `).join('');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [stepsContainer] });
+
+    // Re-bind toggles
+    stepsContainer.querySelectorAll('[data-step-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isOn = btn.textContent === 'ON';
+        btn.textContent = isOn ? 'OFF' : 'ON';
+        btn.classList.toggle('is-off', isOn);
+      });
+    });
+
+    // Reset result and progress
+    const resultEl = document.getElementById('mobile-demo-result');
+    const progressBar = document.getElementById('mobile-demo-progress-bar');
+    if (resultEl) resultEl.innerHTML = '';
+    if (progressBar) progressBar.style.width = '0%';
+    mobileDemoRunning = false;
+  }
+
+  function runMobileDemo() {
+    if (mobileDemoRunning) return;
+    mobileDemoRunning = true;
+
+    const steps = document.querySelectorAll('.mobile-demo-step');
+    const progressBar = document.getElementById('mobile-demo-progress-bar');
+    const resultEl = document.getElementById('mobile-demo-result');
+    const runBtn = document.getElementById('mobile-demo-run');
+
+    if (!steps.length) return;
+
+    // Reset all steps
+    steps.forEach(s => {
+      s.classList.remove('is-running', 'is-completed', 'is-skipped');
+    });
+    if (progressBar) progressBar.style.width = '0%';
+    if (resultEl) resultEl.innerHTML = '';
+    if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Đang chạy...'; }
+
+    const enabledSteps = [];
+    steps.forEach((step, idx) => {
+      const toggle = step.querySelector('[data-step-toggle]');
+      if (toggle && toggle.textContent === 'OFF') {
+        step.classList.add('is-skipped');
+      } else {
+        enabledSteps.push({ el: step, idx });
+      }
+    });
+
+    let currentIdx = 0;
+    const totalSteps = enabledSteps.length;
+
+    function runNextStep() {
+      if (currentIdx >= totalSteps) {
+        // All done
+        if (progressBar) progressBar.style.width = '100%';
+        if (resultEl) {
+          resultEl.innerHTML = `
+            <div class="mobile-demo__result-card">
+              <i data-lucide="check-circle" style="color:var(--green);width:28px;height:28px;"></i>
+              <div>
+                <strong style="color:#fff;">Workflow hoàn thành!</strong>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:4px 0 0;">Đã xử lý ${totalSteps} bước trong ${(totalSteps * 0.6).toFixed(1)}s</p>
+              </div>
+            </div>
+          `;
+          if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [resultEl] });
+        }
+        if (runBtn) { runBtn.disabled = false; runBtn.textContent = 'Chạy lại'; }
+        mobileDemoRunning = false;
+        return;
+      }
+
+      const { el } = enabledSteps[currentIdx];
+      el.classList.add('is-running');
+
+      if (progressBar) {
+        progressBar.style.width = `${((currentIdx + 0.5) / totalSteps) * 100}%`;
+      }
+
+      const delay = 500 + Math.random() * 400;
+      mobileDemoTimer = setTimeout(() => {
+        el.classList.remove('is-running');
+        el.classList.add('is-completed');
+
+        if (progressBar) {
+          progressBar.style.width = `${((currentIdx + 1) / totalSteps) * 100}%`;
+        }
+
+        currentIdx++;
+        mobileDemoTimer = setTimeout(runNextStep, 200);
+      }, delay);
+    }
+
+    runNextStep();
+  }
+
+  function cleanupMobile() {
+    if (mobileObserver) {
+      mobileObserver.disconnect();
+      mobileObserver = null;
+    }
+    clearTimeout(mobileDemoTimer);
+    mobileDemoRunning = false;
+  }
+
   return {
     render,
     init() {
-      initScrollAnimation();
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      if (isMobile) {
+        initMobileStory();
+      } else {
+        initScrollAnimation();
+      }
     },
     scrollToProgress,
     scrollToPlayground,
     tryProductInPlayground,
     closeDetailPanel,
-    cleanup
+    cleanup() {
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      if (isMobile) {
+        cleanupMobile();
+      }
+      // Always run desktop cleanup too (kills ScrollTrigger if any)
+      if (typeof ScrollTrigger !== 'undefined') {
+        const triggers = ScrollTrigger.getAll();
+        triggers.forEach(t => {
+          if (t.trigger && t.trigger.id === 'automation-story-trigger') {
+            t.kill(true);
+          }
+        });
+      }
+      clearInterval(typingTimer);
+      clearTimeout(simTimer);
+      document.body.style.overflow = '';
+      const nav = document.getElementById('main-nav');
+      if (nav) {
+        nav.className = 'nav';
+        nav.style.background = '';
+        nav.style.borderColor = '';
+        nav.style.backdropFilter = '';
+      }
+    }
   };
 })();
