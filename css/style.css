@@ -1,211 +1,195 @@
-/* ============================================================
-   SoftZone — Premium Dark-Mode Design System
-   style.css  ·  Variables · Reset · Typography · Utilities
-   ============================================================ */
+/* ==========================================================================
+   SOFTZONE TECH UNIVERSE - DESIGN SYSTEM & GLOBAL STYLES
+   ========================================================================== */
 
-/* ── Google Fonts ─────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
-/* ============================================================
-   1. CSS Custom Properties
-   ============================================================ */
 :root {
-  /* Core variables */
-  --bg-deep:           #040208;
-  --bg-main:           #080512;
-  --bg-secondary:      #10091f;
-  --bg-panel:          rgba(14, 10, 28, 0.78);
-  --bg-panel-solid:    #100b1e;
-
-  --purple:            #7c3aed;
-  --purple-light:      #a855f7;
-  --violet:            #8b5cf6;
-  --cyan:              #22d3ee;
-  --blue:              #3b82f6;
-  --green:             #34d399;
-  --red:               #fb7185;
-
-  --text-primary:      #f8fafc;
-  --text-secondary:    #b6b4c4;
-  --text-muted:        #77758a;
-
-  --border-soft:       rgba(255, 255, 255, 0.08);
-  --border-active:     rgba(168, 85, 247, 0.5);
-  --border-success:    rgba(52, 211, 153, 0.5);
-
-  --glow-purple:       0 0 80px rgba(124, 58, 237, 0.25);
-  --glow-cyan:         0 0 70px rgba(34, 211, 238, 0.18);
-
-  /* Mapping for backwards compatibility with existing templates */
-  --bg-primary:        var(--bg-main);
-  --bg-tertiary:       var(--bg-secondary);
-  --bg-card:           rgba(255, 255, 255, 0.04);
-  --bg-glass:          rgba(14, 10, 28, 0.65);
-  --bg-glass-hover:    rgba(14, 10, 28, 0.85);
-
-  --accent-primary:    var(--purple);
-  --accent-secondary:  var(--purple-light);
-  --accent-tertiary:   var(--cyan);
-  --accent-gradient:   linear-gradient(135deg, var(--purple), var(--cyan));
-
-  --success:           var(--green);
-  --warning:           #fdcb6e;
-  --danger:            var(--red);
-  --info:              var(--cyan);
-
-  --border-color:      var(--border-soft);
-  --border-color-hover:var(--border-active);
-  --shadow-glow:       var(--glow-purple);
-
-  /* Radii */
-  --radius-sm:         8px;
-  --radius-md:         12px;
-  --radius-lg:         16px;
-  --radius-xl:         24px;
-
-  /* Transitions */
-  --transition-fast:   0.2s ease;
-  --transition-normal: 0.3s ease;
-
-  /* Typography */
-  --font-family:       'Inter', sans-serif;
-  --font-heading:      'Space Grotesk', sans-serif;
-
+  /* Colors */
+  --bg-deep: #03050b;
+  --bg-primary: #070a14;
+  --bg-secondary: #0d1222;
+  --bg-panel: rgba(15, 21, 40, 0.82);
+  --bg-panel-solid: #11182b;
+  
+  --purple: #7c3aed;
+  --violet: #8b5cf6;
+  --cyan: #22d3ee;
+  --blue: #3b82f6;
+  --green: #34d399;
+  --pink: #ec4899;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #b6c0d2;
+  --text-muted: #788399;
+  
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --border-active: rgba(34, 211, 238, 0.45);
+  
+  --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.4);
+  --glow-cyan: 0 0 40px rgba(34, 211, 238, 0.15);
+  --glow-purple: 0 0 40px rgba(124, 58, 237, 0.18);
+  --glow-green: 0 0 40px rgba(52, 211, 153, 0.15);
+  
   /* Layout */
-  --container-width:   1200px;
-  --nav-height:        72px;
+  --nav-height: 80px;
+  --max-width: 1400px;
+  
+  /* Fonts */
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* ============================================================
-   2. Full Reset
-   ============================================================ */
-*,
-*::before,
-*::after {
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
-html {
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   font-size: 16px;
+  line-height: 1.6;
   scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: var(--font-family);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
+/* Hide scrollbar defaults but keep functional */
+body::-webkit-scrollbar {
+  width: 8px;
 }
-
-img,
-svg,
-video {
-  display: block;
-  max-width: 100%;
-  height: auto;
+body::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+body::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-ul,
-ol {
-  list-style: none;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
+button, input, select, textarea {
+  font-family: inherit;
   color: inherit;
+  background: none;
   border: none;
   outline: none;
-  background: none;
 }
 
 button {
   cursor: pointer;
 }
 
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* ============================================================
-   3. Typography
-   ============================================================ */
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
   color: var(--text-primary);
 }
 
-h1 { font-size: clamp(2rem, 5vw, 3rem); }
-h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.1rem; }
-h6 { font-size: 1rem; }
-
-p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-strong {
+.hero-heading {
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
   font-weight: 700;
 }
 
-small {
-  font-size: 0.85rem;
+.section-heading {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
 }
 
-/* ============================================================
-   4. Utility Classes
-   ============================================================ */
-
-/* Container */
-.container {
-  width: 100%;
-  max-width: var(--container-width);
-  margin-inline: auto;
-  padding-inline: 20px;
-}
-
-/* Gradient text */
-.text-gradient {
-  background: var(--accent-gradient);
+.gradient-text {
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--cyan) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glassmorphism */
-.glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-color);
+.gradient-text-purple {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 50%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Visibility */
-.hidden {
-  display: none !important;
+/* ==========================================================================
+   LAYOUT STRUCTURE
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
 }
 
-/* Screen-reader only */
+.section {
+  padding: 100px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.page-view {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Background elements */
+.ambient-glow {
+  position: absolute;
+  width: min(60vw, 800px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(140px);
+  z-index: 0;
+  opacity: 0.12;
+}
+
+.glow-top-right {
+  top: -10%;
+  right: -10%;
+  background: var(--purple);
+}
+
+.glow-bottom-left {
+  bottom: 10%;
+  left: -10%;
+  background: var(--cyan);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & UTILITIES
+   ========================================================================== */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -214,213 +198,37 @@ small {
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
   border: 0;
 }
 
-/* ============================================================
-   5. Scroll Reveal
-   ============================================================ */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
 }
 
-.scroll-reveal.is-revealed {
-  opacity: 1;
-  transform: translateY(0);
+.text-cyan { color: var(--cyan); }
+.text-purple { color: var(--purple); }
+.text-green { color: var(--green); }
+.text-pink { color: var(--pink); }
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ============================================================
-   6. Keyframe Animations
-   ============================================================ */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.06); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
-}
-
-@keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ============================================================
-   7. Custom Scrollbar
-   ============================================================ */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--bg-tertiary) var(--bg-secondary);
-}
-
-/* ============================================================
-   8. Selection
-   ============================================================ */
-::selection {
-  background: rgba(108, 92, 231, 0.35);
-  color: #fff;
-}
-
-/* ============================================================
-   9. Mobile Base Fixes
-   ============================================================ */
-html, body {
-  max-width: 100%;
-  overflow-x: clip;
-}
-
-@media (max-width: 767px) {
-  :root {
-    --nav-height: 64px;
-  }
-
-  .nav {
-    height: var(--nav-height);
-    background: rgba(5, 3, 14, 0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .nav__container {
-    padding-inline: 16px;
-  }
-
-  .nav__logo-text {
-    font-size: 1.15rem;
-  }
-
-  .nav__cart-btn,
-  .nav__mobile-toggle {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .nav__mobile-menu.is-open {
-    background: rgba(5, 3, 14, 0.98);
-  }
-
-  .nav__mobile-link {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-  }
-
-  .container {
-    padding-inline: 16px;
-  }
-
-  .main-content {
-    min-width: 0;
-  }
-}
-
-/* ============================================================
-   10. Reduced Motion
-   ============================================================ */
+/* ==========================================================================
+   REDUCED MOTION SUPPORT
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
-}
-
-/* ============================================================
-   11. Touch Device Hover Fix
-   ============================================================ */
-@media (hover: none) {
-  .btn:hover {
-    transform: none;
-    box-shadow: none;
+  
+  .ambient-glow {
+    display: none !important;
   }
 }

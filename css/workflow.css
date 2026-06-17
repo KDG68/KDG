@@ -1,0 +1,497 @@
+/* ==========================================================================
+   SOFTZONE TECH UNIVERSE - AUTOMATION SIMULATION STYLES
+   ========================================================================== */
+
+.workflow-section {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.workflow-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+
+/* ==========================================================================
+   DESKTOP WORKFLOW CANVAS
+   ========================================================================== */
+.workflow-canvas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.workflow-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 16px 24px;
+  background: rgba(13, 18, 34, 0.6);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+}
+
+.workflow-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workflow-tab-btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+.workflow-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.workflow-tab-btn.active {
+  background: rgba(34, 211, 238, 0.08);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.simulation-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Visual Canvas Layout */
+.simulation-visual-board {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.desktop-flow-board {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px;
+  min-height: 280px;
+  background: rgba(13, 18, 34, 0.4);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.flow-connection-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.flow-line {
+  fill: none;
+  stroke: var(--border-soft);
+  stroke-width: 2.5;
+  transition: all 0.3s ease;
+}
+
+.flow-line-active {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 2.5;
+  stroke-dasharray: 8, 16;
+  stroke-dashoffset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Flow line pulse and flow when running */
+.flow-line-active.pulse {
+  opacity: 1;
+  animation: lineFlow 1s linear infinite;
+}
+
+.flow-line-active.completed {
+  opacity: 0.5;
+  stroke: var(--green);
+  stroke-dasharray: none;
+}
+
+/* Node Elements */
+.flow-node-item {
+  position: relative;
+  z-index: 1;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.node-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.node-icon-wrapper svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.node-label {
+  margin-top: 12px;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.node-status-badge {
+  position: absolute;
+  bottom: -4px;
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+/* Node States Animation */
+/* Idle */
+.flow-node-item.state-idle .node-icon-wrapper {
+  opacity: 0.7;
+}
+
+/* Waiting */
+.flow-node-item.state-waiting .node-icon-wrapper {
+  border-color: var(--blue);
+  color: var(--blue);
+  opacity: 0.85;
+}
+.flow-node-item.state-waiting .node-status-badge {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* Running */
+.flow-node-item.state-running .node-icon-wrapper {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.05);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+  animation: nodePulse 1.5s ease-in-out infinite alternate;
+}
+.flow-node-item.state-running .node-label {
+  color: var(--text-primary);
+}
+.flow-node-item.state-running .node-status-badge {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--bg-deep);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+}
+
+/* Completed */
+.flow-node-item.state-completed .node-icon-wrapper {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(52, 211, 153, 0.04);
+}
+.flow-node-item.state-completed .node-label {
+  color: var(--text-secondary);
+}
+.flow-node-item.state-completed .node-status-badge {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* ==========================================================================
+   SIMULATION OUTPUT CONSOLE
+   ========================================================================== */
+.simulation-console {
+  display: flex;
+  flex-direction: column;
+  background: rgba(13, 18, 34, 0.7);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.console-header {
+  padding: 16px 20px;
+  background: rgba(7, 10, 20, 0.6);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.console-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.console-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+}
+
+.console-status-dot.active {
+  background-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+.console-body {
+  flex: 1;
+  padding: 20px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  color: #a7f3d0; /* Soft green matrix color */
+  overflow-y: auto;
+  min-height: 180px;
+  max-height: 212px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.console-line {
+  line-height: 1.4;
+  opacity: 0.9;
+  animation: consoleFadeIn 0.2s ease-out forwards;
+}
+
+.console-line-time {
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+
+.console-line-success { color: var(--green); }
+.console-line-info { color: var(--cyan); }
+.console-line-warn { color: var(--pink); }
+
+/* ==========================================================================
+   MOBILE WORKFLOW VIEW (VERTICAL TIMELINE)
+   ========================================================================== */
+.mobile-flow-board {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(13, 18, 34, 0.4);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+}
+
+.mobile-timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.mobile-timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 5px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--border-soft);
+}
+
+.mobile-timeline-step {
+  position: relative;
+  padding-bottom: 24px;
+}
+
+.mobile-timeline-step:last-child {
+  padding-bottom: 0;
+}
+
+.mobile-step-marker {
+  position: absolute;
+  left: -24px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 2px solid var(--border-soft);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.mobile-step-content {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.mobile-step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.mobile-step-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.mobile-step-info {
+  flex: 1;
+}
+
+.mobile-step-label {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.mobile-step-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Mobile Timeline Active/Completed styles */
+.mobile-timeline-step.state-waiting .mobile-step-marker { border-color: var(--blue); }
+.mobile-timeline-step.state-waiting .mobile-step-icon { color: var(--blue); border-color: var(--blue); }
+
+.mobile-timeline-step.state-running .mobile-step-marker {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+.mobile-timeline-step.state-running .mobile-step-icon {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgba(34, 211, 238, 0.05);
+}
+.mobile-timeline-step.state-running .mobile-step-label { color: var(--text-primary); }
+.mobile-timeline-step.state-running .mobile-step-status { color: var(--cyan); font-weight: 600; }
+
+.mobile-timeline-step.state-completed .mobile-step-marker {
+  background: var(--green);
+  border-color: var(--green);
+}
+.mobile-timeline-step.state-completed .mobile-step-icon {
+  color: var(--green);
+  border-color: var(--green);
+}
+.mobile-timeline-step.state-completed .mobile-step-status { color: var(--green); }
+
+/* ==========================================================================
+   SIMULATION KEYFRAMES
+   ========================================================================== */
+@keyframes lineFlow {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+@keyframes nodePulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(34, 211, 238, 0.1); }
+  100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(34, 211, 238, 0.3); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes consoleFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .simulation-visual-board {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .desktop-flow-board {
+    display: none;
+  }
+  
+  .mobile-flow-board {
+    display: flex;
+  }
+}
+
+@media (max-width: 479px) {
+  .workflow-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .simulation-actions {
+    justify-content: stretch;
+  }
+  
+  .simulation-actions .btn {
+    flex: 1;
+  }
+  
+  .workflow-selector {
+    justify-content: center;
+  }
+}

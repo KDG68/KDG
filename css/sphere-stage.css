@@ -1,0 +1,553 @@
+/* ==========================================================================
+   SOFTZONE 3D TECHNOLOGY SPHERE - STAGE STYLES
+   ========================================================================== */
+
+:root {
+  --header-height: 80px;
+}
+
+.technology-sphere-stage, .universe-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0;
+  width: 100vw;
+  height: calc(100svh - var(--header-height));
+  margin-top: var(--header-height);
+  overflow: hidden;
+  background: radial-gradient(circle at center, #070e20 0%, #020409 100%);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: grid-template-columns 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+
+.technology-sphere-stage.is-panel-open, .universe-layout.is-panel-open {
+  grid-template-columns: minmax(0, 1fr) clamp(340px, 26vw, 430px);
+}
+
+.universe-workspace {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.sphere-viewport {
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  min-height: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.technology-sphere-canvas, .sphere-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto;
+  outline: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   HUD INTRO TEXT (LEFT SIDE)
+   ========================================================================== */
+.sphere-intro {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 320px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.sphere-intro h2 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sphere-intro p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.sphere-intro-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* ==========================================================================
+   HUD CONTROL BUTTONS
+   ========================================================================== */
+.sphere-controls {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  padding: 8px 12px;
+  background: rgba(13, 18, 34, 0.7);
+  border: 1px solid var(--border-soft);
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.sphere-control-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.sphere-control-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sphere-control-btn:hover {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  transform: translateY(-2px);
+}
+
+.sphere-control-btn:active {
+  transform: translateY(0);
+}
+
+.sphere-control-btn.active {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: var(--purple);
+  color: var(--purple);
+  box-shadow: var(--glow-purple);
+}
+
+.sphere-control-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-soft);
+  margin: 0 4px;
+}
+
+.sphere-perf-btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cyan);
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  background: rgba(34, 211, 238, 0.04);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.sphere-perf-btn:hover {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: var(--cyan);
+}
+
+/* ==========================================================================
+   HUD 3D PROJECTED TOOLTIP
+   ========================================================================== */
+.sphere-tooltip {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  background: rgba(10, 15, 30, 0.9);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translate(-50%, -100%) scale(0.9);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sphere-tooltip.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -120%) scale(1);
+}
+
+.tooltip-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tooltip-color, var(--text-primary));
+}
+
+.tooltip-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.tooltip-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.tooltip-hint {
+  font-size: 0.68rem;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-top: 4px;
+  text-align: right;
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY DRAWER AND TRIGGER
+   ========================================================================== */
+.sphere-list-trigger-wrap {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.sphere-nodes-list-backdrop {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - var(--header-height));
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sphere-nodes-list-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sphere-nodes-list-drawer {
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  width: 380px;
+  height: calc(100vh - var(--header-height));
+  background: var(--bg-panel-solid);
+  border-left: 1px solid var(--border-soft);
+  z-index: 160;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sphere-nodes-list-drawer.is-open {
+  transform: translateX(0);
+}
+
+.nodes-list-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nodes-list-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.nodes-list-search {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-soft);
+  background: rgba(0,0,0,0.1);
+}
+
+.nodes-list-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.node-list-cat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.node-list-cat-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cat-color, var(--text-muted));
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding-bottom: 4px;
+}
+
+.node-list-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.01);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.node-list-item-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--item-color);
+  transform: translateX(-4px);
+}
+
+/* ==========================================================================
+   SLIDING DETAIL PANEL (FITS PC AND MOBILE)
+   ========================================================================== */
+.sphere-detail-panel, .universe-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(9, 14, 31, 0.98);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.technology-sphere-stage.is-panel-open .sphere-detail-panel,
+.universe-layout.is-panel-open .universe-panel,
+.sphere-detail-panel.is-open,
+.universe-panel.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.detail-panel-header, .universe-panel__header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  flex: 0 0 auto;
+}
+
+.detail-panel-body, .universe-panel__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+}
+
+/* Clean scrollbar detail panel */
+.detail-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+.detail-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.detail-panel-body::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   MOBILE & RESPONSIVE CANVAS STYLES
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .universe-layout, .technology-sphere-stage {
+    display: block;
+    height: calc(100svh - var(--header-height) - 100px); /* Leave room for Swiper selector */
+    margin-top: var(--header-height);
+  }
+
+  .universe-workspace {
+    position: absolute;
+    inset: 0;
+    padding-bottom: 0;
+    transition: padding-bottom 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .technology-sphere-stage.is-panel-open .universe-workspace,
+  .universe-layout.is-panel-open .universe-workspace {
+    padding-bottom: 42svh;
+  }
+
+  .technology-sphere-stage.is-panel-open.is-expanded .universe-workspace,
+  .universe-layout.is-panel-open.is-expanded .universe-workspace {
+    padding-bottom: 72svh;
+  }
+
+  .sphere-viewport {
+    touch-action: none;
+  }
+
+  .sphere-detail-panel, .universe-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 42svh;
+    max-height: 72svh;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), height 300ms ease, opacity 220ms ease;
+    z-index: 100;
+    background: rgba(9, 14, 31, 0.98);
+  }
+
+  .technology-sphere-stage.is-panel-open .sphere-detail-panel,
+  .universe-layout.is-panel-open .universe-panel,
+  .sphere-detail-panel.is-open,
+  .universe-panel.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .universe-panel.is-expanded {
+    height: 72svh !important;
+  }
+
+  .universe-panel__body {
+    touch-action: pan-y;
+  }
+
+  .universe-panel__handle {
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    margin: 10px auto 0;
+    cursor: grab;
+    touch-action: none;
+    flex: 0 0 auto;
+  }
+
+  /* Swiper Dock at bottom of screen (above safe area) */
+  .mobile-swiper-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-soft);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    padding: 0 20px env(safe-area-inset-bottom) 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-sectors-swiper {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+  }
+
+  .mobile-sector-card {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+    min-width: 120px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-sector-card.active {
+    background: rgba(34, 211, 238, 0.08);
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .mobile-sector-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+}
+
+/* Hide only intro text when panel is active to avoid clutter, keep controls interactive */
+.technology-sphere-stage.is-panel-open .sphere-intro {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Ensure tooltip stays visible and ignores pointer events */
+.sphere-tooltip {
+  pointer-events: none !important;
+}

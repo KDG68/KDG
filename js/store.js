@@ -1,321 +1,240 @@
-window.SoftwareStore = window.SoftwareStore || {};
+/* ==========================================================================
+   SOFTZONE TECH UNIVERSE - STATE & CART MANAGER
+   ========================================================================== */
 
-SoftwareStore.Store = (() => {
-  const STORAGE_KEY = 'softwareStoreState';
-  const USERS_KEY = 'softwareStoreUsers';
-  const listeners = {};
+(function() {
+  // Cart State
+  let cart = [];
+  let couponCode = "";
+  let discountPercent = 0;
+  const cartListeners = [];
 
-  let state = {
-    cart: [],
-    user: null,
-    wishlist: [],
-    orders: [],
-    isLoggedIn: false,
-    appliedCoupon: null
-  };
-
-  function save() {
+  // Initialize Cart from LocalStorage
+  function initCart() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.warn('Failed to save state:', e);
-    }
-  }
-
-  function load() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        state = { ...state, ...parsed };
+      const storedCart = localStorage.getItem("softzone_cart");
+      if (storedCart) {
+        cart = JSON.parse(storedCart);
+      }
+      const storedCoupon = localStorage.getItem("softzone_coupon");
+      const storedDiscount = localStorage.getItem("softzone_discount");
+      if (storedCoupon && storedDiscount) {
+        couponCode = storedCoupon;
+        discountPercent = parseFloat(storedDiscount);
       }
     } catch (e) {
-      console.warn('Failed to load state:', e);
+      console.error("Lỗi đọc giỏ hàng từ LocalStorage:", e);
+      cart = [];
     }
   }
 
-  function emit(event, data) {
-    (listeners[event] || []).forEach(cb => {
-      try { cb(data); } catch (e) { console.error('Event listener error:', e); }
+  // Save Cart to LocalStorage
+  function saveCart() {
+    try {
+      localStorage.setItem("softzone_cart", JSON.stringify(cart));
+      localStorage.setItem("softzone_coupon", couponCode);
+      localStorage.setItem("softzone_discount", discountPercent.toString());
+    } catch (e) {
+      console.error("Lỗi ghi giỏ hàng vào LocalStorage:", e);
+    }
+    triggerCartChange();
+  }
+
+  // Pub/Sub for Cart Events
+  function onCartChange(callback) {
+    if (typeof callback === "function") {
+      cartListeners.push(callback);
+    }
+  }
+
+  function triggerCartChange() {
+    cartListeners.forEach(listener => {
+      try {
+        listener(cart);
+      } catch (e) {
+        console.error("Lỗi chạy callback giỏ hàng:", e);
+      }
     });
   }
 
-  function getUsers() {
-    try {
-      return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-    } catch { return []; }
-  }
+  // Cart Operations
+  function addItem(productId, licenseType = "monthly") {
+    // Find product in AppData
+    const product = window.AppData.products.find(p => p.id === productId);
+    if (!product) return false;
 
-  function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  }
+    // Check if item with same license already exists
+    const existingIndex = cart.findIndex(item => item.id === productId && item.license === licenseType);
 
-  return {
-    init() {
-      load();
-    },
-
-    get state() {
-      return state;
-    },
-
-    // Event system
-    on(event, callback) {
-      if (!listeners[event]) listeners[event] = [];
-      listeners[event].push(callback);
-    },
-
-    off(event, callback) {
-      if (listeners[event]) {
-        listeners[event] = listeners[event].filter(cb => cb !== callback);
-      }
-    },
-
-    // ========================
-    // CART
-    // ========================
-    addToCart(productId, planType = 'pro') {
-      const existing = state.cart.find(
-        item => item.productId === productId && item.planType === planType
-      );
-      if (existing) {
-        existing.quantity++;
-      } else {
-        state.cart.push({ productId, planType, quantity: 1 });
-      }
-      save();
-      emit('cartUpdated', state.cart);
-    },
-
-    removeFromCart(productId, planType) {
-      state.cart = state.cart.filter(
-        item => !(item.productId === productId && item.planType === planType)
-      );
-      save();
-      emit('cartUpdated', state.cart);
-    },
-
-    updateCartQuantity(productId, planType, quantity) {
-      const item = state.cart.find(
-        i => i.productId === productId && i.planType === planType
-      );
-      if (item) {
-        if (quantity <= 0) {
-          this.removeFromCart(productId, planType);
-          return;
-        }
-        item.quantity = quantity;
-        save();
-        emit('cartUpdated', state.cart);
-      }
-    },
-
-    getCartItems() {
-      return state.cart
-        .map(item => {
-          const product = SoftwareStore.Data.products.find(p => p.id === item.productId);
-          const plan = product?.plans.find(p => p.type === item.planType);
-          return { ...item, product, plan };
-        })
-        .filter(item => item.product && item.plan);
-    },
-
-    getCartSubtotal() {
-      return this.getCartItems().reduce((total, item) => {
-        let price = item.plan.price;
-        if (item.product.discount) {
-          price = price * (1 - item.product.discount / 100);
-        }
-        return total + price * item.quantity;
-      }, 0);
-    },
-
-    getCartDiscount() {
-      if (!state.appliedCoupon) return 0;
-      return this.getCartSubtotal() * (state.appliedCoupon.discount / 100);
-    },
-
-    getCartTotal() {
-      return this.getCartSubtotal() - this.getCartDiscount();
-    },
-
-    getCartCount() {
-      return state.cart.reduce((count, item) => count + item.quantity, 0);
-    },
-
-    clearCart() {
-      state.cart = [];
-      state.appliedCoupon = null;
-      save();
-      emit('cartUpdated', state.cart);
-    },
-
-    // ========================
-    // USER AUTH
-    // ========================
-    register(name, email, password) {
-      const users = getUsers();
-      if (users.find(u => u.email === email)) {
-        return { success: false, message: 'Email đã được sử dụng!' };
-      }
-
-      const user = {
-        id: SoftwareStore.Utils.generateId(),
-        name,
-        email,
-        password: btoa(password),
-        avatar: null,
-        joinDate: new Date().toISOString()
-      };
-
-      users.push(user);
-      saveUsers(users);
-
-      state.user = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        joinDate: user.joinDate
-      };
-      state.isLoggedIn = true;
-      save();
-      emit('userChanged', state.user);
-      return { success: true, message: 'Đăng ký thành công! Chào mừng bạn!' };
-    },
-
-    login(email, password) {
-      const users = getUsers();
-      const user = users.find(
-        u => u.email === email && u.password === btoa(password)
-      );
-      if (!user) {
-        return { success: false, message: 'Email hoặc mật khẩu không đúng!' };
-      }
-
-      state.user = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        joinDate: user.joinDate
-      };
-      state.isLoggedIn = true;
-      save();
-      emit('userChanged', state.user);
-      return { success: true, message: 'Đăng nhập thành công!' };
-    },
-
-    logout() {
-      state.user = null;
-      state.isLoggedIn = false;
-      save();
-      emit('userChanged', null);
-    },
-
-    updateProfile(data) {
-      if (state.user) {
-        state.user = { ...state.user, ...data };
-        // Also update in users storage
-        const users = getUsers();
-        const idx = users.findIndex(u => u.id === state.user.id);
-        if (idx !== -1) {
-          users[idx] = { ...users[idx], ...data };
-          saveUsers(users);
-        }
-        save();
-        emit('userChanged', state.user);
-      }
-    },
-
-    isLoggedIn() {
-      return state.isLoggedIn && state.user !== null;
-    },
-
-    // ========================
-    // WISHLIST
-    // ========================
-    toggleWishlist(productId) {
-      const index = state.wishlist.indexOf(productId);
-      if (index === -1) {
-        state.wishlist.push(productId);
-      } else {
-        state.wishlist.splice(index, 1);
-      }
-      save();
-      emit('wishlistChanged', state.wishlist);
-    },
-
-    isInWishlist(productId) {
-      return state.wishlist.includes(productId);
-    },
-
-    getWishlistItems() {
-      return state.wishlist
-        .map(id => SoftwareStore.Data.products.find(p => p.id === id))
-        .filter(Boolean);
-    },
-
-    // ========================
-    // ORDERS
-    // ========================
-    createOrder(paymentInfo) {
-      const order = {
-        id: 'ORD-' + SoftwareStore.Utils.generateId().toUpperCase().slice(0, 8),
-        items: this.getCartItems().map(item => ({
-          productId: item.productId,
-          productName: item.product.name,
-          productIcon: item.product.icon,
-          planType: item.planType,
-          planName: item.plan.name,
-          price: item.plan.price,
-          quantity: item.quantity,
-          discount: item.product.discount || 0
-        })),
-        subtotal: this.getCartSubtotal(),
-        discount: this.getCartDiscount(),
-        coupon: state.appliedCoupon ? state.appliedCoupon.code : null,
-        total: this.getCartTotal(),
-        date: new Date().toISOString(),
-        status: 'completed',
-        paymentMethod: paymentInfo.method || 'credit_card',
-        customerInfo: paymentInfo.customerInfo || {}
-      };
-
-      state.orders.unshift(order);
-      this.clearCart();
-      save();
-      emit('orderCreated', order);
-      return order;
-    },
-
-    getOrders() {
-      return state.orders;
-    },
-
-    // ========================
-    // COUPONS
-    // ========================
-    applyCoupon(code) {
-      const coupons = SoftwareStore.Data.coupons;
-      const upperCode = code.toUpperCase().trim();
-      if (coupons[upperCode]) {
-        state.appliedCoupon = { code: upperCode, discount: coupons[upperCode] };
-        save();
-        emit('couponApplied', state.appliedCoupon);
-        return {
-          success: true,
-          message: `Áp dụng mã "${upperCode}" thành công! Giảm ${coupons[upperCode]}%`,
-          discount: coupons[upperCode]
-        };
-      }
-      return { success: false, message: 'Mã giảm giá không hợp lệ hoặc đã hết hạn!' };
-    },
-
-    removeCoupon() {
-      state.appliedCoupon = null;
-      save();
-      emit('couponApplied', null);
+    if (existingIndex > -1) {
+      // For digital keys, count is 1. Just notify
+      return { status: "already_exists", product };
+    } else {
+      const price = licenseType === "lifetime" ? product.priceLifetime : product.priceMonthly;
+      cart.push({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        themeColor: product.themeColor,
+        license: licenseType,
+        price: price,
+        product: product // Keep reference
+      });
+      saveCart();
+      return { status: "added", product };
     }
+  }
+
+  function removeItem(productId, licenseType) {
+    const initialLength = cart.length;
+    cart = cart.filter(item => !(item.id === productId && item.license === licenseType));
+    if (cart.length !== initialLength) {
+      saveCart();
+      return true;
+    }
+    return false;
+  }
+
+  function clearCart() {
+    cart = [];
+    couponCode = "";
+    discountPercent = 0;
+    saveCart();
+  }
+
+  function getCartItems() {
+    return [...cart];
+  }
+
+  function getSubtotal() {
+    return cart.reduce((total, item) => total + item.price, 0);
+  }
+
+  function applyCoupon(code) {
+    const formattedCode = code.trim().toUpperCase();
+    if (formattedCode === "KDG50") {
+      couponCode = formattedCode;
+      discountPercent = 0.50; // 50% discount
+      saveCart();
+      return { success: true, discountPercent, message: "Áp dụng mã giảm giá 50% thành công!" };
+    }
+    return { success: false, message: "Mã giảm giá không hợp lệ." };
+  }
+
+  function removeCoupon() {
+    couponCode = "";
+    discountPercent = 0;
+    saveCart();
+  }
+
+  function getDiscountAmount() {
+    return getSubtotal() * discountPercent;
+  }
+
+  function getTotal() {
+    return getSubtotal() - getDiscountAmount();
+  }
+
+  function getCount() {
+    return cart.length;
+  }
+
+  function getCouponCode() {
+    return couponCode;
+  }
+
+  function getDiscountPercent() {
+    return discountPercent;
+  }
+
+  // Catalog Filtering & Search Logic
+  function getFilteredProducts(filters = {}) {
+    const {
+      search = "",
+      category = "all",
+      priceMin = 0,
+      priceMax = 1000,
+      platforms = [], // Array: ['win', 'mac', 'linux', 'web']
+      licenseType = "all", // 'all', 'monthly', 'lifetime'
+      sort = "featured" // 'featured', 'price-asc', 'price-desc', 'rating'
+    } = filters;
+
+    let result = [...window.AppData.products];
+
+    // 1. Search Query
+    if (search.trim() !== "") {
+      const q = search.toLowerCase().trim();
+      result = result.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.tagline.toLowerCase().includes(q) ||
+        p.desc.toLowerCase().includes(q)
+      );
+    }
+
+    // 2. Category Filter
+    if (category !== "all") {
+      result = result.filter(p => p.category === category);
+    }
+
+    // 3. Price Filter (check against monthly or lifetime)
+    result = result.filter(p => {
+      const minPrice = p.priceMonthly; // Start pricing
+      return minPrice >= priceMin && minPrice <= priceMax;
+    });
+
+    // 4. Platforms Filter
+    if (platforms.length > 0) {
+      result = result.filter(p => 
+        platforms.some(plat => p.platforms.includes(plat))
+      );
+    }
+
+    // 5. License Type Filter (some products might only support monthly)
+    if (licenseType !== "all") {
+      if (licenseType === "lifetime") {
+        result = result.filter(p => p.priceLifetime !== undefined);
+      } else if (licenseType === "monthly") {
+        result = result.filter(p => p.priceMonthly !== undefined);
+      }
+    }
+
+    // 6. Sorting
+    if (sort === "price-asc") {
+      result.sort((a, b) => a.priceMonthly - b.priceMonthly);
+    } else if (sort === "price-desc") {
+      result.sort((a, b) => b.priceMonthly - a.priceMonthly);
+    } else if (sort === "rating") {
+      result.sort((a, b) => b.rating - a.rating);
+    } else {
+      // Default: featured (which has featured: true first)
+      result.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return b.rating - a.rating; // tie-breaker
+      });
+    }
+
+    return result;
+  }
+
+  // Initialize
+  initCart();
+
+  // Expose globally
+  window.Store = {
+    addItem,
+    removeItem,
+    clearCart,
+    getCartItems,
+    getSubtotal,
+    applyCoupon,
+    removeCoupon,
+    getDiscountAmount,
+    getTotal,
+    getCount,
+    getCouponCode,
+    getDiscountPercent,
+    onCartChange,
+    getFilteredProducts
   };
 })();
